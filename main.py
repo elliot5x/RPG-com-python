@@ -7,151 +7,218 @@ def cls():
     system("cls") if name == 'nt' else system("clear")
 cls()
 
-opcoes_do_jogador = {
-    "inventario": [],
-    "classe_do_personagem": []
-}
+porcentagem_dificl = 70
 
-# Sistema de lockpicking
-lockpick = {
-    "facil": ["open", "lock", "lock"],
-    "medio": ["open", "lock", "lock", "lock", "lock"],
-    "dificil": ["open", "lock", "lock", "lock", "lock", "lock", "lock"]
+itens = {
+    "gaveta": ["documento"],
+    "gaveta trancada": ["chave do bau"],
+    "bau": ["chave da porta"],
+    "cama": ["grampo velho", "grampo velho", "grampo velho", "chave da gaveta"] 
 }
-porcentagem_facil = 10
-porcentagem_medio = 40
-porcentagem_dificl = 60
+inventario = []
+mente = []
+
 
 def menu():
     while True:
         try:
             cls()
             print("=== MENU ===\n")
-            print("*Digitar 00 em qualquer momento volta para o menu*\n")
+            print("++ digitar 00 volta ao menu ++\n")
             print("[1] Jogar\n[2] Sair\n")
-            escolha = int(input(">> "))
+            digite = int(input(">> "))
 
             opcoes = {
                 1: inicio,
                 2: exit
             }
-            if escolha in opcoes:
-                opcoes_do_jogador["inventario"].clear()
-                opcoes[escolha]()
-            else:
-                print("Erro: Escolha um número válido.")
-                sleep(1.5)
 
+            if digite in opcoes:
+                opcoes[digite]()
+            else:
+                print("Erro: Número inválido.")
+                input("\nENTER para continuar")
         except ValueError:
-            print("Erro: Escolha apenas números válidos.")
-            sleep(1.5)
+            print("Erro: Escolha um número válido.")
+            input("\nENTER para continuar")
 
 def inicio():
     while True:
         try:
             cls()
-            print("=== A CELA ===\n")
-            print("*você está em uma cela\n")
-            print("[1] Olhar em volta\n[2] Tentar abrir a cela\n[3] Gritar que é inocente\n[4] Encostar na grade\n")
-            digite = int(input(">> "))
-
-            gritar = ["Parece que ninguem ouviu", "AAAAAAAAAAA", "EU SOU INOCENTEEEEE", "GUARDA: CALA A BOCA"]
-
-            if digite == 1:
-                olhando()
-            elif digite == 2:
-                if "grampo" in opcoes_do_jogador["inventario"]:
-                    lock = random.choice(lockpick["facil"])
-
-                    if lock == "open":
-                        saindo_da_cela()
-                    else:
-                        print("Mais que porcaria")
-                        if random.random() < (porcentagem_facil / 100.0):
-                            opcoes_do_jogador["inventario"].remove("grampo")
-                        print("*O seu grampo quebrou")
-                        input("\nEnter para continuar")
-
-                else:
-                    print("A cela está trancada")
-                    sleep(2)
-            elif digite == 3:
-                print(random.choice(gritar))
-                sleep(2)
-            elif digite == 4:
-                print("Você encosta na grade e observa os presos e alguns guardas ao longe\n")
-                input("ENTER para voltar")
-            elif digite == 00:
-                menu()
+            print("Tem uma mesa, uma cama e um bau em frente a cama\n")
+            print("[1] Ver cama\n[2] Ver a mesa\n[3] Ver o bau\n")
+            digitar = int(input(">> "))
+            opcoes = {
+                1: cama,
+                2: mesa,
+                3: bau,
+                00: menu
+            }
+            if digitar in opcoes:
+                opcoes[digitar]()
             else:
-                print("Erro: escolha um número válido.")
-                sleep(1.5)
+                print("Erro: número inválido")
+                input("\nENTER para continuar")
         except ValueError:
-            print("Erro: Escolha apenas números válidos.")
-            sleep(1.5)
-
-def olhando():
+            print("Erro: Escolha um número válido.")
+            input("\nENTER para continuar")
+def cama():
     while True:
         try:
             cls()
-            print("=== A CELA ===\n")
-            print("Tem uma cama velha e um colega de cela\n")
-            print("[1] Ver a cama velha\n[2] Falar com o preso\n[3] Voltar")
-            escolha = int(input(">> "))
+            print("=== CAMA ===\n")
+            if "documento" in mente:
+                    cls()
+                    print("[1] Investigar cama\n[2] Olha em baixo da cama\n[3] voltar")
+                    escolher = int(input(">> "))
+                    if escolher == 1:
+                        investigar()
+                    elif escolher == 2:
+                        if "chave da gaveta" in inventario:
+                            print("Esse lugar esta vazio.")
+                            input("\nENTER para continuar")
+                            inicio()
+                        else:
+                            print("Você achou a chave da gaveta.")
+                            print("*Chave da gaveta foi adicionada ao inventario.")
+                            inventario.append("chave da gaveta")
+                            itens["cama"].remove("chave da gaveta")
+                            input("\nENTER para continuar")
+                            cama()
+                    elif escolher == 3:
+                        inicio()
+                    elif escolher == 00:
+                        menu()
+                    else:
+                        print("Erro: Escolha um número válido.")
+            else:
+                cls()
+                print("[1] Investigar cama\n[2] voltar")
+                escolha = int(input(">> "))
 
-            if escolha == 1:
-                if "grampo" in opcoes_do_jogador["inventario"]:
-                    print("A cama está vazia")
-                    sleep(1.5)
+                if escolha == 1:
+                    investigar()
+                elif escolha == 2:
+                    inicio()
+                elif escolha == 00:
+                    menu()
                 else:
-                    print("*Você pegou o grampo\n")
-                    opcoes_do_jogador["inventario"].append("grampo")
-                    sleep(1.5)
+                    print("Erro: Escolha um número válido.")
+                    input("\nENTER para continuar")
+
+        except ValueError:
+            print("Erro: Escolha um número válido.")
+            input("\nENTER para continuar")
+
+def mesa():
+    while True:
+        try:
+            cls()
+            print("== MESA ==\n")
+            print("Tem duas Gavetas aqui")
+            print("[1] Abrir gaveta de cima\n[2] Abrir gaveta de baixo\n[3] Voltar\n")
+            escolha = int(input(">> "))
+    
+            if escolha == 1:
+                if "documento" in mente:
+                    print("Gaveta vazia")
+                    input("\nENTER para continuar")
+                else:
+                    print("Você achou um documento que diz:\nOlhe em baixo da cama")
+                    mente.append("documento")
+                    itens["gaveta"].remove("documento")
+                    input("\nENTER para continuar")
             elif escolha == 2:
-                preso_john()
+                if "chave da gaveta" in inventario:
+                    print("*Você abriu a gaveta\n")
+                    print("Tem uma chave aqui\n")
+                    print("*Chave do bau foi adicionada ao inventario e gaveta foi trancada novamente.")
+                    inventario.append("chave do bau")
+                    itens["gaveta trancada"].remove("chave do bau")
+                    inventario.remove("chave da gaveta")
+                    mesa()
+                    input("\nENTER para continuar")
+                elif "grampo velho" in inventario:
+                        random.random() < (porcentagem_dificl / 100.0)
+                        print("*O grampo quebrou\n")
+                        inventario.remove("grampo velho")
+                        input("\nENTER para continuar")
+                elif "grampo velho" in inventario and "chave da gaveta" in inventario:
+                    print("*Você abriu a gaveta\n")
+                    print("Tem uma chave aqui\n")
+                    print("*Chave do bau foi adicionada ao inventario e gaveta foi trancada novamente.")
+                    inventario.append("chave do bau")
+                    itens["gaveta trancada"].remove("chave do bau")
+                    inventario.remove("chave da gaveta")
+                    mesa()
+                    input("\nENTER para continuar")
+                else:
+                    print("A gaveta esta trancada.")
+                    input("\nENTER para continuar")
             elif escolha == 3:
                 inicio()
             elif escolha == 00:
                 menu()
-            else:
-                print("Erro: Escolha um número válido.")
-                sleep(1.5)
 
         except ValueError:
-            print("Erro: Escolha apenas números válidos.")
-            sleep(1.5)
+            print("Erro: Escolha um número válido.")
+            input("\nENTER para continuar") 
 
-def preso_john():
+def investigar():
     while True:
         try:
-            cls()
-            print("=== JOHN O PRESO ===\n")
-            print("O que você quer garoto?")
-            print("[1] ... [2] ... [3] Voltar")
-            escolha = int(input(">> "))
-
-            if escolha == 1:
-                print("...")
-                sleep(1.5)
-            elif escolha == 2:
-                print("...")
-                sleep(1.5)
-            elif escolha == 3:
-                olhando()
-            elif escolha == 00:
-                menu()
+            if "grampo velho" in inventario:
+                print("Você só pode carregar um grampo por vez")
+                input("\nENTER para continuar")
+                cama()
+            elif "grampo velho" not in itens["cama"]:
+                print("Acabou os grampos. :(")
+                input("\nENTER para continuar")
+                cama()
+                
             else:
-                print("Erro: Escolha um número válido.")
-                sleep(1.5)
+                print("Você achou um grampo velho\n")
+                print("*Grampo velho foi enviado ao inventario")
+                inventario.append("grampo velho")
+                itens["cama"].remove("grampo velho")
+                input("\nENTER para continuar")
+                cama()
+        except ValueError:
+            print("Erro: Escolha um número válido.")
+            input("\nENTER para continuar")
+
+def bau():
+    while True:
+        try:
+            if "chave do bau" in inventario:
+                print("abrindo bau com a chave")
+                sleep(2)
+                for i in range(0,1):
+                    cls()
+                    print("Destrancando bau.")
+                    sleep(0.5)
+                    cls()
+                    print("Destrancando o bau..")
+                    sleep(0.5)
+                    cls()
+                    print("Destrancando o bau...")
+                    sleep(0.5)
+                    cls()
+                    input("*Bau aberto")
+                    input("\nENTER para continuar")
+                    saida()
+            else:
+                print("O bau esta trancado")
+                input("\nENTER para continuar") 
+                inicio()        
 
         except ValueError:
-            print("Erro: Escolha apenas números válidos.")
-            sleep(1.5)
+            print("Erro: Escolha um número válido.")
+            input("\nENTER para continuar")
 
-def saindo_da_cela():
-    cls()
-    print("*Você saiu da cela.")
-    input(" Aperte ENTER para sair")
+def saida():
+    print("Obrigado por jogar :)\n")
+    input("\nENTER para continuar")
     menu()
-
 menu()
