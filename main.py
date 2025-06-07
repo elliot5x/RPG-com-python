@@ -134,11 +134,12 @@ def mesa():
                     print("*Você abriu a gaveta\n")
                     print("Tem uma chave aqui\n")
                     print("*Chave do bau foi adicionada ao inventario e gaveta foi trancada novamente.")
+                    input("\nENTER para continuar")
                     inventario.append("chave do bau")
                     itens["gaveta trancada"].remove("chave do bau")
                     inventario.remove("chave da gaveta")
                     mesa()
-                    input("\nENTER para continuar")
+                    
                 elif "grampo velho" in inventario:
                         random.random() < (porcentagem_dificl / 100.0)
                         print("*O grampo quebrou\n")
@@ -192,22 +193,11 @@ def bau():
     while True:
         try:
             if "chave do bau" in inventario:
-                print("abrindo bau com a chave")
+                print("abrindo bau com a chave\n")
                 sleep(2)
-                for i in range(0,1):
-                    cls()
-                    print("Destrancando bau.")
-                    sleep(0.5)
-                    cls()
-                    print("Destrancando o bau..")
-                    sleep(0.5)
-                    cls()
-                    print("Destrancando o bau...")
-                    sleep(0.5)
-                    cls()
-                    input("*Bau aberto")
-                    input("\nENTER para continuar")
-                    saida()
+                cls()
+                print("O bau foi aberto e tinha muitos tesouros.\n")
+                saida()
             else:
                 print("O bau esta trancado")
                 input("\nENTER para continuar") 
@@ -219,6 +209,9 @@ def bau():
 
 def saida():
     print("Obrigado por jogar :)\n")
+    inventario.clear()
+    itens.clear()
+    mente.clear()
     input("\nENTER para continuar")
     menu()
 menu()
