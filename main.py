@@ -2,19 +2,39 @@ from time import sleep
 from os import system, name
 from sys import exit
 import random
+import uuid
 
 def cls():
     system("cls") if name == 'nt' else system("clear")
 cls()
 
-porcentagem_dificl = 70
+chande_de_quebrar = 90 # São 90% de chance de quebrar.
 
-itens = {
-    "gaveta": ["documento"],
-    "gaveta trancada": ["chave do bau"],
-    "bau": ["chave da porta"],
-    "cama": ["grampo velho", "grampo velho", "grampo velho", "chave da gaveta"] 
+itens_disponiveis = {
+    "gaveta": {
+        "nome": "Documento Confidencial",
+        "quantidade": 1,
+        "descricao": "Tente olhar de baixo da cama"
+    },
+    "gaveta_trancada": {
+        "nome": "Chave do Bau",
+        "quantidade": 1,
+        "descricao": "Pode ser usada para abrir o bau."
+    },
+    "cama": {
+        "grampo": {
+            "nome": "Grampo Velho",
+            "quantidade": 3,
+            "descricao": "Pode ser usado para abrir qualquer tranca, mas quebra com muita facilidade."
+        },
+        "chave": {
+            "nome": "Chave da Gaveta",
+            "quantidade": 1,
+            "descricao": "Pode ser usada para abrir a gaveta trancada."
+        }
+    }
 }
+
 inventario = []
 mente = []
 
@@ -68,22 +88,23 @@ def cama():
         try:
             cls()
             print("=== CAMA ===\n")
-            if "documento" in mente:
+            if "Documento Confidencial" in mente:
                     cls()
                     print("[1] Investigar cama\n[2] Olha em baixo da cama\n[3] voltar")
                     escolher = int(input(">> "))
                     if escolher == 1:
                         investigar()
                     elif escolher == 2:
-                        if "chave da gaveta" in inventario:
+                        if "Chave da Gaveta" in inventario:
                             print("Esse lugar esta vazio.")
                             input("\nENTER para continuar")
-                            inicio()
+                            cama()
                         else:
-                            print("Você achou a chave da gaveta.")
-                            print("*Chave da gaveta foi adicionada ao inventario.")
-                            inventario.append("chave da gaveta")
-                            itens["cama"].remove("chave da gaveta")
+                            print(f"Você achou a {itens_disponiveis['cama']["chave"]["nome"]}")
+                            print(f"*{itens_disponiveis['cama']["chave"]["nome"]} foi adicionada ao inventario.")
+                            inventario.append("Chave da Gaveta")
+                            sua_quantidade = itens_disponiveis["cama"]["chave"]["quantidade"]
+                            itens_disponiveis["cama"]["chave"]["quantidade"] -= sua_quantidade
                             input("\nENTER para continuar")
                             cama()
                     elif escolher == 3:
@@ -121,39 +142,51 @@ def mesa():
             escolha = int(input(">> "))
     
             if escolha == 1:
-                if "documento" in mente:
+                if "Documento Confidencial" in mente:
                     print("Gaveta vazia")
                     input("\nENTER para continuar")
                 else:
-                    print("Você achou um documento que diz:\nOlhe em baixo da cama")
-                    mente.append("documento")
-                    itens["gaveta"].remove("documento")
+                    print(f"Você achou o {itens_disponiveis['gaveta']["nome"]} que diz:\n{itens_disponiveis['gaveta']["descricao"]}")
+                    mente.append("Documento Confidencial")
+                    sua_quantidade = itens_disponiveis["gaveta"]["quantidade"]
+                    itens_disponiveis["gaveta"]["quantidade"] -= sua_quantidade
                     input("\nENTER para continuar")
             elif escolha == 2:
-                if "chave da gaveta" in inventario:
+                if "Chave da Gaveta" in inventario:
+                    cls()
                     print("*Você abriu a gaveta\n")
                     print("Tem uma chave aqui\n")
-                    print("*Chave do bau foi adicionada ao inventario e gaveta foi trancada novamente.")
+                    print(f"*{itens_disponiveis['gaveta_trancada']["nome"]} foi adicionada ao inventario e gaveta foi trancada novamente.")
                     input("\nENTER para continuar")
-                    inventario.append("chave do bau")
-                    itens["gaveta trancada"].remove("chave do bau")
-                    inventario.remove("chave da gaveta")
+                    inventario.append("Chave do Bau")
+                    quantidade_chave_bau = itens_disponiveis["gaveta_trancada"]["quantidade"]
+                    itens_disponiveis["gaveta_trancada"]["quantidade"] -= quantidade_chave_bau
                     mesa()
                     
-                elif "grampo velho" in inventario:
-                        random.random() < (porcentagem_dificl / 100.0)
-                        print("*O grampo quebrou\n")
-                        inventario.remove("grampo velho")
+                elif "Grampo Velho" in inventario:
+                        print("Você tenta abrir a gaveta com um grampo...")
                         input("\nENTER para continuar")
-                elif "grampo velho" in inventario and "chave da gaveta" in inventario:
-                    print("*Você abriu a gaveta\n")
-                    print("Tem uma chave aqui\n")
-                    print("*Chave do bau foi adicionada ao inventario e gaveta foi trancada novamente.")
-                    inventario.append("chave do bau")
-                    itens["gaveta trancada"].remove("chave do bau")
-                    inventario.remove("chave da gaveta")
-                    mesa()
-                    input("\nENTER para continuar")
+                        if random.random() < (chande_de_quebrar / 100.0):
+                            print("*O grampo quebrou\n")
+                            inventario.remove("Grampo Velho")
+                            input("\nENTER para continuar")
+                        else:
+                            cls()
+                            print("*Você conseguiu abrir a gaveta!\n")
+                            input("\nENTER para continuar")
+                            inventario.remove("Grampo Velho")
+                            if itens_disponiveis["gaveta_trancada"]["quantidade"] > 0:
+                                cls()
+                                print("Tem uma chave aqui.\n")
+                                print(f"*{itens_disponiveis['gaveta_trancada']['nome']} foi adicionada ao inventario.")
+                                input("\nENTER para continuar")
+                                inventario.append("Chave do Bau")
+                                itens_disponiveis["gaveta_trancada"]["quantidade"] -= 1
+                            else:
+                                cls()
+                                print("A gaveta está vazia.")
+                                input("\nENTER para continuar")
+                            mesa()
                 else:
                     print("A gaveta esta trancada.")
                     input("\nENTER para continuar")
@@ -161,7 +194,6 @@ def mesa():
                 inicio()
             elif escolha == 00:
                 menu()
-
         except ValueError:
             print("Erro: Escolha um número válido.")
             input("\nENTER para continuar") 
@@ -169,22 +201,23 @@ def mesa():
 def investigar():
     while True:
         try:
-            if "grampo velho" in inventario:
-                print("Você só pode carregar um grampo por vez")
+            if "Grampo Velho" in inventario:
+                print("Você só pode usar um grampo por vez.\n")
+                print(f"restam {itens_disponiveis["cama"]["grampo"]["quantidade"]} grampos.")
                 input("\nENTER para continuar")
-                cama()
-            elif "grampo velho" not in itens["cama"]:
-                print("Acabou os grampos. :(")
-                input("\nENTER para continuar")
-                cama()
-                
+                cama()  
             else:
-                print("Você achou um grampo velho\n")
-                print("*Grampo velho foi enviado ao inventario")
-                inventario.append("grampo velho")
-                itens["cama"].remove("grampo velho")
-                input("\nENTER para continuar")
-                cama()
+                if itens_disponiveis["cama"]["grampo"]["quantidade"] > 0:
+                    print("Você achou um grampo velho\n")
+                    print(f"*{itens_disponiveis['cama']["grampo"]["nome"]} foi enviado ao inventario")
+                    inventario.append("Grampo Velho") 
+                    itens_disponiveis["cama"]["grampo"]["quantidade"] -= 1
+                    input("\nENTER para continuar")
+                    cama()
+                else:
+                    print("Esse Lugar esta Vazio.")
+                    input("\nENTER para continuar")
+                    cama()
         except ValueError:
             print("Erro: Escolha um número válido.")
             input("\nENTER para continuar")
@@ -192,25 +225,42 @@ def investigar():
 def bau():
     while True:
         try:
-            if "chave do bau" in inventario:
+            if "Chave do Bau" in inventario:
                 print("abrindo bau com a chave\n")
-                sleep(2)
+                input("\nENTER para continuar")
                 cls()
                 print("O bau foi aberto e tinha muitos tesouros.\n")
+                input("\nENTER para continuar")
                 saida()
+            elif "Grampo Velho" in inventario:
+                print("Você tenta abrir o bau com um grampo velho...")
+                input("\nENTER para continuar")
+                if random.random() < (chande_de_quebrar / 100.0):
+                    print("*O grampo quebrou\n")
+                    inventario.remove("Grampo Velho")
+                    input("\nENTER para continuar")
+                    inicio()
+                else:
+                    cls()
+                    print("Você conseguiu abrir o bau!")
+                    input("\nENTER para continuar")
+                    cls()
+                    print("O bau foi aberto e tinha muitos tesouros.\n")
+                    input("\nENTER para continuar")
+                    saida() 
             else:
                 print("O bau esta trancado")
                 input("\nENTER para continuar") 
                 inicio()        
-
         except ValueError:
             print("Erro: Escolha um número válido.")
             input("\nENTER para continuar")
 
 def saida():
+    cls()
     print("Obrigado por jogar :)\n")
     inventario.clear()
-    itens.clear()
+    itens_disponiveis.clear()
     mente.clear()
     input("\nENTER para continuar")
     menu()
